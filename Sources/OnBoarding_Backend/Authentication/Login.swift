@@ -40,16 +40,16 @@ class Login {
     
     //MARK:- Parser
     func jsonString(rows: RowSequence) -> String {
-        var jsonString: String = "["
+        var jsonString: String = ""
         for row in rows {
             jsonString += "{"
             let name = row[0] as? String ?? ""
             let email = row[1] as? String ?? ""
             let identifier = row[2] as? String ?? ""
             let password = row[3] as? String ?? ""
-            jsonString += "name: \(name), email: \(email), identifier: \(identifier), password: \(password)},"
+            jsonString += "\"name\": \"\(name)\", \"email\": \"\(email)\", \"identifier\": \"\(identifier)\", \"password\": \"\(password)\"}"
         }
-        jsonString += "]"
+       
         return jsonString
     }
 }
