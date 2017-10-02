@@ -18,24 +18,21 @@ class Login {
     
     //MARK:- MS
     func login() {
-        var payload = "asdadas"
+        var payload = "[]"
         router.get("/Authentication") { [unowned self] request, response, next in
-            let username = request.queryParameters["usernames"] ?? ""
+            let username = request.queryParameters["username"] ?? ""
             let password = request.queryParameters["password"] ?? ""
             self.connection.connect() {[unowned self] error in
                 let associate = AssociateT()
-                let query = Select(from: associate).where(
-                    (associate.identifier == username) && (associate.password == password)
-                )
+                let query = Select(from: associate).where(associate.identifier == username && associate.password == password)
                 self.connection.execute(query: query) {queryResult in
                     guard let resultSet = queryResult.asResultSet else {
-                        response.send("[]")
+                        response.send("")
                         return
                     }
                     for row in resultSet.rows {
                         let associate = Associate(row: row)
-                        let jsonString = Mapper().toJSONString(associate, prettyPrint: true)
-                        payload = jsonString!
+                        payload = Mapper().toJSONString(associate, prettyPrint: true)!
                     }
                 }
             }
