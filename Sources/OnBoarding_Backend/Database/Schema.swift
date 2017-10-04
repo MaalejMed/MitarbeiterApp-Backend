@@ -9,3 +9,11 @@ class AssociateT: Table {
     let name = Column("name")
     let password = Column("password")
 }
+
+class FeedT: Table {
+    let tableName = "feed"
+    let title = Column("title")
+    let description = Column("description")
+    let details = Column("details")
+    let date = Column("date")
+}
