@@ -16,6 +16,7 @@ class TimeService {
         router.all(middleware: BodyParser())
         self.connection = connection
         submit()
+        lastSubmittedDay()
     }
     
     func submit() {
@@ -63,6 +64,30 @@ class TimeService {
             }
            try response.send("\(responseStatus)").end()
             responseStatus = 0
+        }
+    }
+    
+    func lastSubmittedDay() {
+        var payload = "[]"
+        router.get("/Time") { [unowned self] request, response, next in
+            let associateID = request.queryParameters["associateID"] ?? ""
+            self.connection.connect() {[unowned self] error in
+                let time = TimeT()
+                let query = Select(time.day, from: time).where(time.associateID == associateID).order(by: .DESC(time.day))
+                self.connection.execute(query: query) {queryResult in
+                    guard let resultSet = queryResult.asResultSet else {
+                        response.send("")
+                        return
+                    }
+                    for row in resultSet.rows {
+                        payload = String(describing: row)
+                        break
+                    }
+                }
+            }
+            response.send(payload)
+            payload = "[]"
+            next()
         }
     }
 }
