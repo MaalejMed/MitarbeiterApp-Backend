@@ -9,10 +9,13 @@ let connection = MySQLConnection(host: "localhost", user: "root", password: "mys
                                  port: 3306, characterSet: nil)
 
 //Authentication services
-let loginMS = Login(router: router, connection: connection)
+let loginMS = LoginService(router: router, connection: connection)
 
 //Feed services
 let feedMS = FeedService(router: router, connection: connection)
+
+//Time services
+let timeMS = TimeService(router: router, connection: connection)
 
 Kitura.addHTTPServer(onPort: 8080, with: router)
 Kitura.run()

@@ -12,7 +12,6 @@ let package = Package(
          .package(url: "https://github.com/IBM-Swift/CMySQL.git", .upToNextMinor(from: "0.1.0")),
          .package(url: "https://github.com/IBM-Swift/SwiftKueryMySQL.git", .upToNextMinor(from: "0.13.0")),
          .package(url: "https://github.com/Hearst-DD/ObjectMapper.git", from: "2.0.0"),
-
     ],
     
     targets: [

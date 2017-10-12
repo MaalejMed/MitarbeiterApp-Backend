@@ -17,3 +17,18 @@ class FeedT: Table {
     let details = Column("details")
     let date = Column("date")
 }
+
+class TimeT: Table {
+    let tableName = "time"
+    let associateID = Column("associateID")
+    let day = Column("day")
+    let projectID = Column("projectID")
+    let activity = Column("activity")
+    let billable = Column("billable")
+    let startWork = Column("startWork")
+    let endWork = Column("endWork")
+    let workedHours = Column("workedHours")
+    let startBreak = Column("startBreak")
+    let endBreak = Column("endBreak")
+    let lunchBreak = Column("lunchBreak")
+}

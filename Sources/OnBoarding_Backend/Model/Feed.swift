@@ -21,7 +21,6 @@ struct Feed: Mappable {
         title = row[0] as? String ?? ""
         description = row[1] as? String ?? ""
         details = row[2] as? String ?? ""
-        
         let dateString = row[3] as? String ?? nil
         date = dateString?.simpleDateFormat()
     }

@@ -3,7 +3,7 @@ import SwiftKueryMySQL
 import SwiftKuery
 import ObjectMapper
 
-class Login {
+class LoginService {
     
     //MARK:- Properties
     var router: Router
