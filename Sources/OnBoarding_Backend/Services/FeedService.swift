@@ -5,6 +5,7 @@ import ObjectMapper
 import Foundation
 
 class FeedService {
+    
     //MARK:- Properties
     var router: Router
     var connection: MySQLConnection
@@ -16,6 +17,7 @@ class FeedService {
         fetch()
     }
     
+    //MARK:- Fetch
     func fetch() {
         var feeds : [Feed] = []
         router.get("/Feed") { [unowned self] request, response, next in
@@ -32,8 +34,11 @@ class FeedService {
                     }
                 }
             }
-            let payload = feeds.toJSONString(prettyPrint: true)!
-            response.send(payload)
+            guard let json = feeds.toJSONString(prettyPrint: true) else {
+                response.send("")
+                return
+            }
+            response.send(json)
             feeds.removeAll()
             next()
         }

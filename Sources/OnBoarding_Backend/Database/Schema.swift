@@ -25,10 +25,8 @@ class TimeT: Table {
     let projectID = Column("projectID")
     let activity = Column("activity")
     let billable = Column("billable")
-    let startWork = Column("startWork")
-    let endWork = Column("endWork")
+    let workFrom = Column("workFrom")
+    let workUntil = Column("workUntil")
     let workedHours = Column("workedHours")
-    let startBreak = Column("startBreak")
-    let endBreak = Column("endBreak")
     let lunchBreak = Column("lunchBreak")
 }

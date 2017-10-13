@@ -29,21 +29,14 @@ class TimeService {
             }
             switch (body) {
             case .json(let jsonData):
-                let assoID = jsonData["associateID"].string ?? ""
-                let day = jsonData["day"].string ?? ""
-                let projectID = jsonData["projectID"].string ?? ""
-                let activity = jsonData["activity"].string ?? ""
-                let billable = jsonData["billable"].string ?? ""
-                let startWork = jsonData["from"].string ?? ""
-                let endWork = jsonData["until"].string ?? ""
-                let workedHours = jsonData["workedHours"].string ?? ""
-                let lunchBreak = jsonData["lunchBreak"].string ?? ""
+                let timesheet = Timesheet(row: jsonData)
                 self.connection.connect() { [weak self] error in
-                    let timesheet = TimeT()
-                    let query = Insert(into: timesheet,
-                                       columns:[timesheet.associateID, timesheet.day, timesheet.projectID, timesheet.activity, timesheet.billable, timesheet.startWork, timesheet.endWork, timesheet.workedHours, timesheet.lunchBreak],
-                                       values: [assoID, day, projectID, activity, billable, startWork, endWork, workedHours, lunchBreak])
-                    
+                let timesheetTable = TimeT()
+
+                let query = Insert(into: timesheetTable,
+                                   columns:[timesheetTable.associateID, timesheetTable.day, timesheetTable.projectID, timesheetTable.activity, timesheetTable.billable, timesheetTable.workFrom, timesheetTable.workUntil, timesheetTable.workedHours, timesheetTable.lunchBreak],
+                                   values: [timesheet.associateID!, timesheet.day!, timesheet.projectID!, timesheet.activity!, timesheet.billable!, timesheet.workFrom!, timesheet.workUntil!, timesheet.workedHours!, timesheet.lunchBreak!])
+
                     self?.connection.execute(query: query) { queryResult in
                         guard queryResult.success else {
                             responseStatus = HTTPStatusCode.notAcceptable.rawValue
@@ -59,6 +52,7 @@ class TimeService {
                 }
                 
             default:
+                responseStatus = HTTPStatusCode.notAcceptable.rawValue
                 next()
                 return
             }
@@ -68,7 +62,7 @@ class TimeService {
     }
     
     func lastSubmittedDay() {
-        var payload = "[]"
+        var lastSubmittedDay: String?
         router.get("/Time") { [unowned self] request, response, next in
             let associateID = request.queryParameters["associateID"] ?? ""
             self.connection.connect() {[unowned self] error in
@@ -80,13 +74,18 @@ class TimeService {
                         return
                     }
                     for row in resultSet.rows {
-                        payload =  row[0] as? String ?? ""
+                        lastSubmittedDay =  row[0] as? String ?? ""
                         break
                     }
                 }
             }
-            response.send(payload)
-            payload = "[]"
+            
+            guard let day = lastSubmittedDay else {
+                response.send("[]")
+                return
+            }
+            response.send(day)
+            lastSubmittedDay = nil
             next()
         }
     }

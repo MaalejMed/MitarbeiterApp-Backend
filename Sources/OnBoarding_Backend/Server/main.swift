@@ -2,21 +2,22 @@ import Kitura
 import SwiftKueryMySQL
 import SwiftKuery
 
-// Create a new router
+//MARK:- Create a new router
 let router = Router()
 
 let connection = MySQLConnection(host: "localhost", user: "root", password: "mysql", database: "cognizant",
                                  port: 3306, characterSet: nil)
 
-//Authentication services
-let loginMS = LoginService(router: router, connection: connection)
+//MARK:- Authentication services
+let loginS = LoginService(router: router, connection: connection)
 
-//Feed services
-let feedMS = FeedService(router: router, connection: connection)
+//MARK:- Feed services
+let feedS = FeedService(router: router, connection: connection)
 
-//Time services
-let timeMS = TimeService(router: router, connection: connection)
+//MARK:- Time services
+let timeS = TimeService(router: router, connection: connection)
 
+//MARK:-Start Service
 Kitura.addHTTPServer(onPort: 8080, with: router)
 Kitura.run()
     
