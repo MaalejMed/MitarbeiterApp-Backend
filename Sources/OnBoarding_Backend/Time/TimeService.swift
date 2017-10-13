@@ -80,7 +80,7 @@ class TimeService {
                         return
                     }
                     for row in resultSet.rows {
-                        payload = String(describing: row)
+                        payload =  row[0] as? String ?? ""
                         break
                     }
                 }
