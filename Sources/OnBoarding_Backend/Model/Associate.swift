@@ -7,14 +7,16 @@ struct Associate: Mappable {
     var email: String?
     var name: String?
     var password: String?
-    var image: String?
+    var imageURL: String?
+    var imageString: String?
     
     init(row: [Any?]) {
         name = row[0] as? String ?? ""
         email = row[1] as? String ?? ""
         identifier = row[2] as? String ?? ""
         password = row[3] as? String ?? ""
-        image = row[4] as? String ?? ""
+        imageURL = row[4] as? String ?? ""
+        imageString = PhotoManager.readImage(associateID: identifier!)
     }
     
     init?(map: Map) {
@@ -27,6 +29,7 @@ struct Associate: Mappable {
         email <- map["email"]
         name <- map["name"]
         password <- map["password"]
-        image <- map["photo"]
+        imageString <- map["photo"]
+        
     }
 }
