@@ -9,7 +9,7 @@ let connection = MySQLConnection(host: "localhost", user: "root", password: "mys
                                  port: 3306, characterSet: nil)
 
 //MARK:- Authentication services
-let loginS = LoginService(router: router, connection: connection)
+let associateS = AssociateService(router: router, connection: connection)
 
 //MARK:- Feed services
 let feedS = FeedService(router: router, connection: connection)

@@ -8,6 +8,7 @@ class AssociateT: Table {
     let email = Column("email")
     let name = Column("name")
     let password = Column("password")
+    let photo = Column("photo")
 }
 
 class FeedT: Table {
