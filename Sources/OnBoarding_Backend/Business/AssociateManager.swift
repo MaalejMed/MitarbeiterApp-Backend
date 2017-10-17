@@ -4,6 +4,7 @@ import SwiftKueryMySQL
 import SwiftKuery
 import KituraNet
 import ObjectMapper
+import SwiftyJSON
 
 class AssociateManager {
     
@@ -45,5 +46,33 @@ class AssociateManager {
         }
         
         completion(associateJson, nil)
+    }
+    
+    // MARK:- Change profile image
+    func updateProfileImage(json: JSON, completion: @escaping (HTTPStatusCode?)->()) {
+        
+        guard let imageString = json["photo"].string, let associateID = json["associateID"].string else {
+            completion(HTTPStatusCode.badRequest)
+            return
+        }
+        
+        guard let imagePath = PhotoManager.save(image: imageString, associateID: associateID) else {
+            completion(HTTPStatusCode.badRequest)
+            return
+        }
+        
+        self.connection.connect() { [weak self] error in
+            let associateTable = AssociateT()
+            
+            let query = Update(associateTable, set:[(associateTable.photo, imagePath)]).where(associateTable.identifier == associateID)
+            
+            self?.connection.execute(query: query) { queryResult in
+                guard queryResult.success == true else {
+                    completion(HTTPStatusCode.badRequest)
+                    return
+                }
+            }
+        }
+        completion(nil)
     }
 }
