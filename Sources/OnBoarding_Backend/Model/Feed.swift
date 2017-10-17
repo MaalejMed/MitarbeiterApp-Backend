@@ -11,6 +11,8 @@ import SwiftKueryMySQL
 import ObjectMapper
 
 struct Feed: Mappable {
+    
+    //MARK:- Properties
     var identifier: String?
     var title: String?
     var description: String?
@@ -25,16 +27,16 @@ struct Feed: Mappable {
         date = dateString?.simpleDateFormat()
     }
     
+    //MARK:- mappable
     init?(map: Map) {
         
     }
     
-    // Mappable
     mutating func mapping(map: Map) {
         title <- map["title"]
         description <- map["description"]
         details <- map["details"]
-        
+
         let dateFormatter = DateFormatter()
         dateFormatter.dateFormat = "yyyy-MM-dd"
         date <- (map["date"], DateFormatterTransform(dateFormatter: dateFormatter))

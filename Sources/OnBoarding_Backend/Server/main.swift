@@ -8,14 +8,14 @@ let router = Router()
 let connection = MySQLConnection(host: "localhost", user: "root", password: "mysql", database: "cognizant",
                                  port: 3306, characterSet: nil)
 
-//MARK:- Authentication services
-let associateS = AssociateService(router: router, connection: connection)
+//MARK:- Associate services
+let associateService = AssociateService(router: router, connection: connection)
 
 //MARK:- Feed services
-let feedS = FeedService(router: router, connection: connection)
+let feedService = FeedService(router: router, connection: connection)
 
 //MARK:- Time services
-let timeS = TimeService(router: router, connection: connection)
+let timeService = TimeService(router: router, connection: connection)
 
 //MARK:-Start Service
 Kitura.addHTTPServer(onPort: 8080, with: router)

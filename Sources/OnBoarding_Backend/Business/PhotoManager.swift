@@ -22,11 +22,9 @@ class PhotoManager {
         var imageString: String?
         do {
             try imageString = String.init(contentsOfFile: path)
-       
         } catch {
             print(error.localizedDescription)
         }
         return imageString
-
     }
 }

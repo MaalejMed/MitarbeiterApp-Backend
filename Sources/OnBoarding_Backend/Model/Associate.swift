@@ -19,17 +19,16 @@ struct Associate: Mappable {
         imageString = PhotoManager.readImage(associateID: identifier!)
     }
     
+    // Mappable
     init?(map: Map) {
         
     }
     
-    // Mappable
     mutating func mapping(map: Map) {
         identifier <- map["identifier"]
         email <- map["email"]
         name <- map["name"]
         password <- map["password"]
         imageString <- map["photo"]
-        
     }
 }
