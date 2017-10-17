@@ -3,7 +3,7 @@ import Foundation
 class PhotoManager {
     
     //MARK:- Properties
-    static let directoryPath = "/Users/mmaalej/Dev/OnBoarding_Backend/Profile-Photos/"
+    static let directoryPath = "/Users/mmaalej/Dev/Profile-Photos/"
     
     //MARK:- Save image as text
     static func save(image: String, associateID: String) -> String? {
