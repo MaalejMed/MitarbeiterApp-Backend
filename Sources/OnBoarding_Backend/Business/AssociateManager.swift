@@ -19,7 +19,7 @@ class AssociateManager {
         router.all(middleware: BodyParser())
     }
     
-    //MARK: Get user
+    //MARK: Select user
     func selectAssociate(username: String, password: String, completion: @escaping (String?, HTTPStatusCode?)->()) {
         var associate: Associate?
         self.connection.connect() {[unowned self] error in
@@ -48,8 +48,8 @@ class AssociateManager {
         completion(associateJson, nil)
     }
     
-    // MARK:- Change profile image
-    func updateProfileImage(json: JSON, completion: @escaping (HTTPStatusCode)->()) {
+    // MARK:- Update profile image
+    func updateAssociatePhoto(json: JSON, completion: @escaping (HTTPStatusCode)->()) {
         guard let imageString = json["photo"].string, let associateID = json["associateID"].string else {
             completion(HTTPStatusCode.badRequest)
             return

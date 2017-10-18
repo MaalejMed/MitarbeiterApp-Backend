@@ -16,42 +16,28 @@ struct Timesheet {
     var billable: String?
     
     //MARK:- Init
-    init(row: JSON) {
-        if let assocID = row["associateID"].string {
-            associateID = assocID
-        }
-        
-        if let projID = row["projectID"].string {
-            projectID = projID
-        }
-
-        if let act = row["activity"].string {
-            activity = act
-        }
-
-        if let bill = row["billable"].string {
-            billable = bill
+    init?(row: JSON) {
+        guard let assocID = row["associateID"].string,
+              let projID = row["projectID"].string,
+              let act = row["activity"].string,
+              let bill = row["billable"].string,
+              let lunch = row["lunchBreak"].string,
+              let wHours = row["workedHours"].string,
+              let dayString = row["day"].string,
+              let workFromString = row["workFrom"].string,
+              let workUntilString = row["workUntil"].string else {
+            return nil
         }
 
-        if  let lunch = row["lunchBreak"].string {
-            lunchBreak = lunch
-        }
-
-        if let wHours = row["workedHours"].string {
-            workedHours = wHours
-        }
-
-        if let dayString = row["day"].string {
-            day = dayString.simpleDateFormat()
-        }
-
-        if let workFromString = row["workFrom"].string {
-            workFrom = workFromString.longDateFormat()
-        }
-
-        if let workUntilString = row["workUntil"].string {
-            workUntil = workUntilString.longDateFormat()
-        }
+        associateID = assocID
+        projectID = projID
+        activity = act
+        billable = bill
+        lunchBreak = lunch
+        workedHours = wHours
+        day = dayString.simpleDateFormat()
+        workFrom = workFromString.longDateFormat()
+        workUntil = workUntilString.longDateFormat()
     }
     
 }

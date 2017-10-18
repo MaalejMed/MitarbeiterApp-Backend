@@ -13,55 +13,34 @@ class TimeService {
     //MARK:- Init
     init(router: Router, connection: MySQLConnection) {
         self.router = router
-        router.all(middleware: BodyParser())
         self.connection = connection
-        submit()
-        lastSubmittedDay()
+        router.all(middleware: BodyParser())
+        submitTimesheet()
+        lastSubmission()
     }
     
-    func submit() {
-        var responseStatus = 0
+    //MARK:- POST timesheet
+    func submitTimesheet() {
+        var responseStatus: HTTPStatusCode?
         router.post("/Time") {request, response, next in
-            guard let body = request.body else {
-                responseStatus = HTTPStatusCode.notAcceptable.rawValue
+            guard let jsonPayload = Formatter.jsonPayload(request: request) else {
+                try response.send("\(HTTPStatusCode.badRequest.rawValue)").end()
                 next()
                 return
             }
-            switch (body) {
-            case .json(let jsonData):
-                let timesheet = Timesheet(row: jsonData)
-                self.connection.connect() { [weak self] error in
-                let timesheetTable = TimeT()
-
-                let query = Insert(into: timesheetTable,
-                                   columns:[timesheetTable.associateID, timesheetTable.day, timesheetTable.projectID, timesheetTable.activity, timesheetTable.billable, timesheetTable.workFrom, timesheetTable.workUntil, timesheetTable.workedHours, timesheetTable.lunchBreak],
-                                   values: [timesheet.associateID!, timesheet.day!, timesheet.projectID!, timesheet.activity!, timesheet.billable!, timesheet.workFrom!, timesheet.workUntil!, timesheet.workedHours!, timesheet.lunchBreak!])
-
-                    self?.connection.execute(query: query) { queryResult in
-                        guard queryResult.success else {
-                            responseStatus = HTTPStatusCode.notAcceptable.rawValue
-                            next()
-                            return
-                        }
-                        if  queryResult.success {
-                            responseStatus = HTTPStatusCode.OK.rawValue
-                        } else {
-                            responseStatus = HTTPStatusCode.notAcceptable.rawValue
-                        }
-                    }
-                }
-                
-            default:
-                responseStatus = HTTPStatusCode.notAcceptable.rawValue
-                next()
-                return
-            }
-           try response.send("\(responseStatus)").end()
-            responseStatus = 0
+            
+            let timeManager = TimeManager(router: self.router, connection: self.connection)
+            timeManager.insertTimesheet(json: jsonPayload, completion: { response in
+                responseStatus = response
+            })
+            
+            try response.send("\(responseStatus!.rawValue)").end()
+            next()
         }
+        responseStatus = HTTPStatusCode.unknown
     }
     
-    func lastSubmittedDay() {
+    func lastSubmission() {
         var lastSubmittedDay: String?
         router.get("/Time") { [unowned self] request, response, next in
             let associateID = request.queryParameters["associateID"] ?? ""
