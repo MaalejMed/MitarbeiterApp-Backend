@@ -24,10 +24,9 @@ class AssociateService {
         router.get("/Login") { [unowned self] request, response, next in
             let username = request.queryParameters["username"] ?? ""
             let password = request.queryParameters["password"] ?? ""
-            
             let associateManager = AssociateManager(router: self.router, connection: self.connection)
             associateManager.selectAssociate(username: username, password: password, completion: { associate, failure in
-                guard let exsitingAssociate = associate else {
+                guard let exsitingAssociate = associate,  failure == nil else {
                     response.send("\(failure!.rawValue)")
                     return
                 }
@@ -39,22 +38,22 @@ class AssociateService {
     
     //MARK:- Profile photo
     func changeProfilePhoto() {
-        var responseStatus = HTTPStatusCode.OK.rawValue
+        var responseStatus = HTTPStatusCode.unknown
         router.post("/ProfilePhoto") {request, response, next in
             guard let jsonPayload = Formatter.jsonPayload(request: request) else {
-                try response.send("\(HTTPStatusCode.badRequest)").end()
+                try response.send("\(HTTPStatusCode.badRequest.rawValue)").end()
                 next()
                 return
             }
             
             let associateManager = AssociateManager(router: self.router, connection: self.connection)
             associateManager.updateProfileImage(json: jsonPayload, completion: { response in
-                responseStatus = response.rawValue
+                responseStatus = response
             })
             
-            try response.send("\(responseStatus)").end()
+            try response.send("\(responseStatus.rawValue)").end()
             next()
         }
-        responseStatus = HTTPStatusCode.OK.rawValue
+        responseStatus = HTTPStatusCode.unknown
     }
 }
