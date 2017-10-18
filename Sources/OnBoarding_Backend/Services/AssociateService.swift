@@ -1,9 +1,8 @@
 import Foundation
 import Kitura
-import SwiftKueryMySQL
 import SwiftKuery
 import KituraNet
-import ObjectMapper
+import SwiftKueryMySQL
 
 class AssociateService {
     
@@ -22,12 +21,12 @@ class AssociateService {
     
     //MARK:- Login
     func login() {
-        router.get("/AssociateLogin") { [unowned self] request, response, next in
+        router.get("/Login") { [unowned self] request, response, next in
             let username = request.queryParameters["username"] ?? ""
             let password = request.queryParameters["password"] ?? ""
             
             let associateManager = AssociateManager(router: self.router, connection: self.connection)
-            associateManager.fetchAssociate(username: username, password: password, completion: { associate, failure in
+            associateManager.selectAssociate(username: username, password: password, completion: { associate, failure in
                 guard let exsitingAssociate = associate else {
                     response.send("\(failure!.rawValue)")
                     return
@@ -38,26 +37,21 @@ class AssociateService {
         }
     }
     
-    //MARK:- Update profile photo
+    //MARK:- Profile photo
     func changeProfilePhoto() {
         var responseStatus = HTTPStatusCode.OK.rawValue
-        router.post("/AssociatePhoto") {request, response, next in
-            guard let body = request.body else {
+        router.post("/ProfilePhoto") {request, response, next in
+            guard let jsonPayload = Formatter.jsonPayload(request: request) else {
                 try response.send("\(HTTPStatusCode.badRequest)").end()
                 next()
                 return
             }
-            switch (body) {
-            case .json(let jsonData):
-                let associateManager = AssociateManager(router: self.router, connection: self.connection)
-                associateManager.updateProfileImage(json: jsonData, completion: { failure in
-                    responseStatus = (failure != nil) ? failure!.rawValue : HTTPStatusCode.OK.rawValue
-                })
-                
-            default:
-                responseStatus = HTTPStatusCode.badRequest.rawValue
-                next()
-            }
+            
+            let associateManager = AssociateManager(router: self.router, connection: self.connection)
+            associateManager.updateProfileImage(json: jsonPayload, completion: { response in
+                responseStatus = response.rawValue
+            })
+            
             try response.send("\(responseStatus)").end()
             next()
         }

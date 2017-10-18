@@ -20,7 +20,7 @@ class AssociateManager {
     }
     
     //MARK: Get user
-    func fetchAssociate(username: String, password: String, completion: @escaping (String?, HTTPStatusCode?)->()) {
+    func selectAssociate(username: String, password: String, completion: @escaping (String?, HTTPStatusCode?)->()) {
         var associate: Associate?
         self.connection.connect() {[unowned self] error in
             let associateTable = AssociateT()
@@ -41,7 +41,7 @@ class AssociateManager {
         }
         
         guard let associateJson = Mapper().toJSONString(existingAssociate, prettyPrint: true) else {
-            completion(nil, HTTPStatusCode.unknown)
+            completion(nil, HTTPStatusCode.badRequest)
             return
         }
         
@@ -49,8 +49,7 @@ class AssociateManager {
     }
     
     // MARK:- Change profile image
-    func updateProfileImage(json: JSON, completion: @escaping (HTTPStatusCode?)->()) {
-        
+    func updateProfileImage(json: JSON, completion: @escaping (HTTPStatusCode)->()) {
         guard let imageString = json["photo"].string, let associateID = json["associateID"].string else {
             completion(HTTPStatusCode.badRequest)
             return
@@ -63,9 +62,7 @@ class AssociateManager {
         
         self.connection.connect() { [weak self] error in
             let associateTable = AssociateT()
-            
             let query = Update(associateTable, set:[(associateTable.photo, imagePath)]).where(associateTable.identifier == associateID)
-            
             self?.connection.execute(query: query) { queryResult in
                 guard queryResult.success == true else {
                     completion(HTTPStatusCode.badRequest)
@@ -73,6 +70,6 @@ class AssociateManager {
                 }
             }
         }
-        completion(nil)
+        completion(HTTPStatusCode.OK)
     }
 }
