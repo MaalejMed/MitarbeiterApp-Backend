@@ -36,4 +36,30 @@ class TimeManager {
             }
         }
     }
+    
+    //MARK:- Select last submission
+    func selectLastSubmittedDay(associateID: String , completion: @escaping ((String?, HTTPStatusCode?)->())) {
+        var lastSubmittedDay: String?
+        self.connection.connect() {[unowned self] error in
+            let time = TimeT()
+            let query = Select(time.day, from: time).where(time.associateID == associateID).order(by: .DESC(time.day))
+            self.connection.execute(query: query) {queryResult in
+                guard let resultSet = queryResult.asResultSet else {
+                    completion(nil, HTTPStatusCode.serviceUnavailable)
+                    return
+                }
+                for row in resultSet.rows {
+                    lastSubmittedDay = row[0] as? String ?? ""
+                    break
+                }
+            }
+        }
+        
+        guard let day = lastSubmittedDay else {
+            completion(nil, HTTPStatusCode.notFound)
+            return
+        }
+        completion(day, nil)
+        lastSubmittedDay = nil
+    }
 }

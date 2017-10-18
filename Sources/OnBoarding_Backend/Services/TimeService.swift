@@ -41,31 +41,21 @@ class TimeService {
     }
     
     func lastSubmission() {
+        var responseStatus: HTTPStatusCode?
         var lastSubmittedDay: String?
         router.get("/Time") { [unowned self] request, response, next in
             let associateID = request.queryParameters["associateID"] ?? ""
-            self.connection.connect() {[unowned self] error in
-                let time = TimeT()
-                let query = Select(time.day, from: time).where(time.associateID == associateID).order(by: .DESC(time.day))
-                self.connection.execute(query: query) {queryResult in
-                    guard let resultSet = queryResult.asResultSet else {
-                        response.send("")
-                        return
-                    }
-                    for row in resultSet.rows {
-                        lastSubmittedDay =  row[0] as? String ?? ""
-                        break
-                    }
-                }
-            }
+            let timeManager = TimeManager(router: self.router, connection: self.connection)
+            timeManager.selectLastSubmittedDay(associateID: associateID, completion: { day, failure in
+                lastSubmittedDay = day
+                responseStatus = failure
+            })
             
-            guard let day = lastSubmittedDay else {
-                response.send("[]")
-                return
-            }
-            response.send(day)
-            lastSubmittedDay = nil
+            let _ = (lastSubmittedDay != nil && responseStatus == nil) ? try response.send(lastSubmittedDay!).end() : try response.send("\(responseStatus!.rawValue)").end()
             next()
         }
+        responseStatus = HTTPStatusCode.unknown
+        lastSubmittedDay = nil
+
     }
 }

@@ -27,7 +27,7 @@ class AssociateManager {
             let query = Select(from: associateTable).where(associateTable.identifier == username && associateTable.password == password)
             self.connection.execute(query: query) {queryResult in
                 guard let resultSet = queryResult.asResultSet else {
-                    completion(nil, HTTPStatusCode.notFound)
+                    completion(nil, HTTPStatusCode.serviceUnavailable)
                     return
                 }
                 for row in resultSet.rows {
