@@ -32,6 +32,10 @@ class TimeManager {
                                values: [timesheet.associateID!, timesheet.day!, timesheet.projectID!, timesheet.activity!, timesheet.billable!, timesheet.workFrom!, timesheet.workUntil!, timesheet.workedHours!, timesheet.lunchBreak!])
             
             self?.connection.execute(query: query) { queryResult in
+                guard queryResult.asError == nil else {
+                    completion(HTTPStatusCode.serviceUnavailable)
+                    return
+                }
                 let _ = (queryResult.success) ? completion(HTTPStatusCode.OK) : completion(HTTPStatusCode.badRequest)
             }
         }
@@ -55,11 +59,6 @@ class TimeManager {
             }
         }
         
-        guard let day = lastSubmittedDay else {
-            completion(nil, HTTPStatusCode.notFound)
-            return
-        }
-        completion(day, nil)
-        lastSubmittedDay = nil
+        let _ = (lastSubmittedDay != nil) ? completion(lastSubmittedDay, nil) : completion(nil, HTTPStatusCode.notFound)
     }
 }

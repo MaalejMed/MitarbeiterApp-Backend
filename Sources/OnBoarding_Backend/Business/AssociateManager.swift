@@ -44,7 +44,6 @@ class AssociateManager {
             completion(nil, HTTPStatusCode.badRequest)
             return
         }
-        
         completion(associateJson, nil)
     }
     
@@ -64,12 +63,13 @@ class AssociateManager {
             let associateTable = AssociateT()
             let query = Update(associateTable, set:[(associateTable.photo, imagePath)]).where(associateTable.identifier == associateID)
             self?.connection.execute(query: query) { queryResult in
-                guard queryResult.success == true else {
-                    completion(HTTPStatusCode.badRequest)
+                guard queryResult.asError == nil else {
+                    completion(HTTPStatusCode.serviceUnavailable)
                     return
                 }
+                let _ =  queryResult.success == true ?  completion(HTTPStatusCode.OK): completion(HTTPStatusCode.badRequest)
+                
             }
         }
-        completion(HTTPStatusCode.OK)
     }
 }
