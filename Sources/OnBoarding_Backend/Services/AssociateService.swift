@@ -39,7 +39,7 @@ class AssociateService {
     //MARK:- POST: Profile photo
     func changeProfilePhoto() {
         var responseStatus: HTTPStatusCode?
-        router.post("/ProfilePhoto") {request, response, next in
+        router.post("/ChangeProfilePhoto") {request, response, next in
             guard let jsonPayload = Formatter.jsonPayload(request: request) else {
                 try response.send("\(HTTPStatusCode.badRequest.rawValue)").end()
                 next()

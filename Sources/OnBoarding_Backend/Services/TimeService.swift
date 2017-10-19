@@ -16,13 +16,13 @@ class TimeService {
         self.connection = connection
         router.all(middleware: BodyParser())
         submitTimesheet()
-        lastSubmission()
+        lastSubmittedDay()
     }
     
-    //MARK:- POST timesheet
+    //MARK:-
     func submitTimesheet() {
         var responseStatus: HTTPStatusCode?
-        router.post("/Time") {request, response, next in
+        router.post("/SubmitTimesheet") {request, response, next in
             guard let jsonPayload = Formatter.jsonPayload(request: request) else {
                 try response.send("\(HTTPStatusCode.badRequest.rawValue)").end()
                 next()
@@ -40,10 +40,10 @@ class TimeService {
         responseStatus = HTTPStatusCode.unknown
     }
     
-    func lastSubmission() {
+    func lastSubmittedDay() {
         var responseStatus: HTTPStatusCode?
         var lastSubmittedDay: String?
-        router.get("/Time") { [unowned self] request, response, next in
+        router.get("/LastSubmittedDay") { [unowned self] request, response, next in
             let associateID = request.queryParameters["associateID"] ?? ""
             let timeManager = TimeManager(router: self.router, connection: self.connection)
             timeManager.selectLastSubmittedDay(associateID: associateID, completion: { day, failure in

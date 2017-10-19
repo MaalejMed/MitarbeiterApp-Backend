@@ -18,7 +18,7 @@ class TimeManager {
         router.all(middleware: BodyParser())
     }
     
-    //MARK:- Insert time
+    //MARK:-
     func insertTimesheet(json: JSON, completion: @escaping (HTTPStatusCode)->()) {
         guard let timesheet = Timesheet(row: json) else {
             completion(HTTPStatusCode.badRequest)
