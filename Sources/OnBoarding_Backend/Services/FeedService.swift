@@ -22,7 +22,7 @@ class FeedService {
         router.get("/Feed") { [unowned self] request, response, next in
             let feedManager = FeedManager(router: self.router, connection: self.connection)
             feedManager.selectFeeds(completion: { feedJson, failure in
-                guard let feeds = feedJson,  failure == nil else {
+                guard let feeds = feedJson else {
                     response.send("\(failure!.rawValue)")
                     return
                 }

@@ -15,26 +15,27 @@ class FeedManager {
     init(router: Router, connection: MySQLConnection) {
         self.router = router
         self.connection = connection
-        router.all(middleware: BodyParser())
     }
     
     func selectFeeds(completion: @escaping (String?, HTTPStatusCode?)->()) {
-        var feeds : [Feed] = []
-        let feed = FeedT()
-        let query = Select(from: feed).order(by: .DESC(feed.date))
-        self.connection.execute(query: query) {queryResult in
-            guard let resultSet = queryResult.asResultSet else {
-                completion(nil, HTTPStatusCode.serviceUnavailable)
+        self.connection.connect() {[unowned self] error in
+            var feeds : [Feed] = []
+            let feed = FeedT()
+            let query = Select(from: feed).order(by: .DESC(feed.date))
+            self.connection.execute(query: query) {queryResult in
+                guard let resultSet = queryResult.asResultSet else {
+                    completion(nil, HTTPStatusCode.serviceUnavailable)
+                    return
+                }
+                for row in resultSet.rows {
+                    feeds.append(Feed(row: row))
+                }
+            }
+            guard let json = feeds.toJSONString(prettyPrint: true) else {
+                completion(nil, HTTPStatusCode.badRequest)
                 return
             }
-            for row in resultSet.rows {
-                feeds.append(Feed(row: row))
-            }
+            completion(json, nil)
         }
-        guard let json = feeds.toJSONString(prettyPrint: true) else {
-            completion(nil, HTTPStatusCode.badRequest)
-            return
-        }
-        completion(json, nil)
     }
 }

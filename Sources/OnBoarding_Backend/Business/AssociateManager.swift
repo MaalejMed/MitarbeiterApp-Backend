@@ -35,16 +35,16 @@ class AssociateManager {
                 }
             }
         }
-        guard let existingAssociate = associate else {
+        guard let theAssociate = associate else {
             completion(nil, HTTPStatusCode.unauthorized)
             return
         }
         
-        guard let associateJson = Mapper().toJSONString(existingAssociate, prettyPrint: true) else {
+        guard let jsonPayload = Mapper().toJSONString(theAssociate, prettyPrint: true) else {
             completion(nil, HTTPStatusCode.badRequest)
             return
         }
-        completion(associateJson, nil)
+        completion(jsonPayload, nil)
     }
     
     // MARK:-
