@@ -19,28 +19,16 @@ class FeedService {
     
     //MARK:- Fetch
     func fetch() {
-        var feeds : [Feed] = []
         router.get("/Feed") { [unowned self] request, response, next in
-            self.connection.connect() {[unowned self] error in
-                let feed = FeedT()
-                let query = Select(from: feed).order(by: .DESC(feed.date))
-                self.connection.execute(query: query) {queryResult in
-                    guard let resultSet = queryResult.asResultSet else {
-                        response.send("")
-                        return
-                    }
-                    for row in resultSet.rows {
-                        feeds.append(Feed(row: row))
-                    }
+            let feedManager = FeedManager(router: self.router, connection: self.connection)
+            feedManager.selectFeeds(completion: { feedJson, failure in
+                guard let feeds = feedJson,  failure == nil else {
+                    response.send("\(failure!.rawValue)")
+                    return
                 }
-            }
-            guard let json = feeds.toJSONString(prettyPrint: true) else {
-                response.send("")
-                return
-            }
-            response.send(json)
-            feeds.removeAll()
-            next()
+                response.send(feeds)
+                next()
+            })
         }
     }
 }
