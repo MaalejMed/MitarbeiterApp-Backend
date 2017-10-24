@@ -39,4 +39,13 @@ class MessageT: Table {
     let body = Column("body")
     let date = Column("date")
     let identifier = Column("identifier")
+    let hasResponse = Column("hasResponse")
+}
+
+class MessageResponseT: Table {
+    let tableName = "messageResponse"
+    let identifier = Column("identifier")
+    let body = Column("body")
+    let date = Column("date")
+    let messageID = Column("messageID")
 }
