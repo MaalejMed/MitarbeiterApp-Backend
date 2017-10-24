@@ -1,14 +1,15 @@
 import Foundation
 import SwiftyJSON
+import ObjectMapper
 
-struct Message {
+struct Message: Mappable {
     
     //MARK:- Properties
-    let identifier: String?
-    let title: String?
-    let body: String?
-    let associateID: String?
-    let date: Date?
+    var identifier: String?
+    var title: String?
+    var body: String?
+    var associateID: String?
+    var date: Date?
     
     //MARK:- Init
     //MARK:- Init
@@ -27,4 +28,30 @@ struct Message {
         date = dat.simpleDateFormat()
         title = titl
     }
+    
+    init(row: [Any?]) {
+        associateID = row[0] as? String ?? ""
+        title = row[1] as? String ?? ""
+        body = row[2] as? String ?? ""
+        let dateString = row[3] as? String ?? nil
+        date = dateString?.simpleDateFormat()
+        identifier = row[4] as? String ?? ""
+    }
+    
+    //MARK:- mappable
+    init?(map: Map) {
+        
+    }
+    
+    mutating func mapping(map: Map) {
+        identifier <- map["identifier"]
+        associateID <- map["associateID"]
+        title <- map["title"]
+        body <- map["body"]
+
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "yyyy-MM-dd"
+        date <- (map["date"], DateFormatterTransform(dateFormatter: dateFormatter))
+    }
+    
 }

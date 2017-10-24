@@ -39,4 +39,27 @@ class MessageManager {
             }
         }
     }
+    
+    //MARK:-
+    func selectMessages(associateID: String , completion: @escaping ((String?, HTTPStatusCode?)->())) {
+        self.connection.connect() {[unowned self] error in
+            var messages : [Message] = []
+            let messagesT = MessageT()
+            let query = Select(from: messagesT).where(messagesT.associateID == associateID).order(by: .DESC(messagesT.date))
+            self.connection.execute(query: query) {queryResult in
+                guard let resultSet = queryResult.asResultSet else {
+                    completion(nil, HTTPStatusCode.serviceUnavailable)
+                    return
+                }
+                for row in resultSet.rows {
+                    messages.append(Message(row: row))
+                }
+            }
+            guard let json = messages.toJSONString(prettyPrint: true) else {
+                completion(nil, HTTPStatusCode.badRequest)
+                return
+            }
+            completion(json, nil)
+        }
+    }
 }

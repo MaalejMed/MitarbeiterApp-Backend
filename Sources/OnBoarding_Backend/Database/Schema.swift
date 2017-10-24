@@ -34,9 +34,9 @@ class TimeT: Table {
 
 class MessageT: Table {
     let tableName = "message"
-    let identifier = Column("identifier")
     let associateID = Column("associateID")
     let title = Column("title")
     let body = Column("body")
     let date = Column("date")
+    let identifier = Column("identifier")
 }
