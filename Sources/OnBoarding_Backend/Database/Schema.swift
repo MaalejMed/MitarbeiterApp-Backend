@@ -31,3 +31,12 @@ class TimeT: Table {
     let workedHours = Column("workedHours")
     let lunchBreak = Column("lunchBreak")
 }
+
+class MessageT: Table {
+    let tableName = "message"
+    let identifier = Column("identifier")
+    let associateID = Column("associateID")
+    let title = Column("title")
+    let body = Column("body")
+    let date = Column("date")
+}

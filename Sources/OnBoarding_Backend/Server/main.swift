@@ -17,6 +17,9 @@ let feedService = FeedService(router: router, connection: connection)
 //MARK:- Time services
 let timeService = TimeService(router: router, connection: connection)
 
+//MARK: - Message services
+let messageService = MessageService(router: router, connection: connection)
+
 //MARK:-Start Service
 Kitura.addHTTPServer(onPort: 8080, with: router)
 Kitura.run()
