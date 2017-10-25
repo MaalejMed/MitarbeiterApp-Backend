@@ -39,13 +39,13 @@ class MessageT: Table {
     let body = Column("body")
     let date = Column("date")
     let identifier = Column("identifier")
-    let hasSubMessage = Column("hasSubMessage")
 }
 
-class MessageResponseT: Table {
+class SubMessageT: Table {
     let tableName = "subMessage"
     let identifier = Column("identifier")
     let body = Column("body")
     let date = Column("date")
     let messageID = Column("messageID")
+    let owner = Column("owner")
 }

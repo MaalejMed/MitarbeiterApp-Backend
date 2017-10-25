@@ -12,7 +12,6 @@ struct Message: Mappable {
     var date: Date?
     
     //MARK:- Init
-    //MARK:- Init
     init?(row: JSON) {
         guard let assocID = row["associateID"].string,
             let ident = row["identifier"].string,

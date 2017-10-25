@@ -17,6 +17,7 @@ class MessageService {
         router.all(middleware: BodyParser())
         submitMessage()
         fetch()
+        fetchSubMessages()
     }
     
     func submitMessage() {
@@ -41,6 +42,21 @@ class MessageService {
             let associateID = request.queryParameters["associateID"] ?? ""
             let messageManager = MessageManager(router: self.router, connection: self.connection)
             messageManager.selectMessages(associateID: associateID , completion: { messageJson, failure in
+                guard let messages = messageJson else {
+                    response.send("\(failure!.rawValue)")
+                    return
+                }
+                response.send(messages)
+                next()
+            })
+        }
+    }
+    
+    func fetchSubMessages() {
+        router.get("/SubMessage") { [unowned self] request, response, next in
+            let messageID = request.queryParameters["messageID"] ?? ""
+            let messageManager = MessageManager(router: self.router, connection: self.connection)
+            messageManager.selectSubMessages(messageID: messageID , completion: { messageJson, failure in
                 guard let messages = messageJson else {
                     response.send("\(failure!.rawValue)")
                     return
