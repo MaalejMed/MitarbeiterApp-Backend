@@ -12,6 +12,23 @@ struct SubMessage: Mappable {
     var owner: Bool?
     
     //MARK:- Init
+    
+    init?(row: JSON) {
+        guard let msgID = row["messageID"].string,
+            let ident = row["identifier"].string,
+            let bod = row["body"].string,
+            let dat = row["date"].string,
+            let owner = row["owner"].bool else {
+                return nil
+        }
+        
+        self.messageID = msgID
+        self.identifier = ident
+        self.body = bod
+        self.date = dat.simpleDateFormat()
+        self.owner = owner
+    }
+    
     init(row: [Any?]) {
         identifier = row[0] as? String ?? ""
         body = row[1] as? String ?? ""

@@ -16,6 +16,7 @@ class MessageService {
         self.connection = connection
         router.all(middleware: BodyParser())
         submitMessage()
+        submitSubMessage()
         fetch()
         fetchSubMessages()
     }
@@ -30,6 +31,23 @@ class MessageService {
             }
             let messageManager = MessageManager(router: self.router, connection:self.connection)
             messageManager.insertMessage(json: jsonPayload, completion: { response in
+                responseStatus = response
+            })
+            try response.send("\(responseStatus!.rawValue)").end()
+            next()
+        }
+    }
+    
+    func submitSubMessage() {
+        var responseStatus: HTTPStatusCode?
+        router.post("/SubmitSubMessage") {request, response, next in
+            guard let jsonPayload = Formatter.jsonPayload(request: request) else {
+                try response.send("\(HTTPStatusCode.badRequest.rawValue)").end()
+                next()
+                return
+            }
+            let messageManager = MessageManager(router: self.router, connection:self.connection)
+            messageManager.insertSubMessage(json: jsonPayload, completion: { response in
                 responseStatus = response
             })
             try response.send("\(responseStatus!.rawValue)").end()

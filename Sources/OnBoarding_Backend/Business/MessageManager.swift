@@ -40,6 +40,26 @@ class MessageManager {
         }
     }
     
+    func insertSubMessage(json: JSON, completion: @escaping (HTTPStatusCode)->()) {
+        guard let subMessage = SubMessage(row: json) else {
+            completion(HTTPStatusCode.badRequest)
+            return
+        }
+        self.connection.connect() { [weak self] error in
+            let subMsgT = SubMessageT()
+            let query = Insert(into: subMsgT,
+                               columns:[subMsgT.identifier, subMsgT.body, subMsgT.date, subMsgT.messageID, subMsgT.owner],
+                               values: [subMessage.identifier!, subMessage.body!, subMessage.date!, subMessage.messageID!, subMessage.owner!])
+            self?.connection.execute(query: query) { queryResult in
+                guard queryResult.asError == nil else {
+                    completion(HTTPStatusCode.serviceUnavailable)
+                    return
+                }
+                let _ = (queryResult.success) ? completion(HTTPStatusCode.OK) : completion(HTTPStatusCode.badRequest)
+            }
+        }
+    }
+    
     //MARK:-
     func selectMessages(associateID: String , completion: @escaping ((String?, HTTPStatusCode?)->())) {
         self.connection.connect() {[unowned self] error in
