@@ -24,16 +24,16 @@ struct Message: Mappable {
         associateID = assocID
         identifier = ident
         body = bod
-        date = dat.simpleDateFormat()
+        date = dat.longDateFormat()
         title = titl
     }
+    
     
     init(row: [Any?]) {
         associateID = row[0] as? String ?? ""
         title = row[1] as? String ?? ""
         body = row[2] as? String ?? ""
-        let dateString = row[3] as? String ?? nil
-        date = dateString?.simpleDateFormat()
+        date = row[3] as? Date ?? nil
         identifier = row[4] as? String ?? ""
     }
     
@@ -49,7 +49,7 @@ struct Message: Mappable {
         body <- map["body"]
 
         let dateFormatter = DateFormatter()
-        dateFormatter.dateFormat = "yyyy-MM-dd"
+        dateFormatter.dateFormat = "yyyy-MM-dd HH:mm:ss"
         date <- (map["date"], DateFormatterTransform(dateFormatter: dateFormatter))
     }
     

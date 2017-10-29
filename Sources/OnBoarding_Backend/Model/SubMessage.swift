@@ -25,19 +25,15 @@ struct SubMessage: Mappable {
         self.messageID = msgID
         self.identifier = ident
         self.body = bod
-        self.date = dat.simpleDateFormat()
+        self.date = dat.longDateFormat()
         self.owner = owner
     }
     
     init(row: [Any?]) {
         identifier = row[0] as? String ?? ""
         body = row[1] as? String ?? ""
-        
-        let dateString = row[2] as? String ?? nil
-        date = dateString?.simpleDateFormat()
-        
+        date = row[2] as? Date ?? nil
         messageID = row[3] as? String ?? ""
-        
         
         let  ownerAttribute = row[4] as! NSNumber
         owner = Bool(truncating: ownerAttribute)
@@ -55,7 +51,7 @@ struct SubMessage: Mappable {
         owner <- map["owner"]
 
         let dateFormatter = DateFormatter()
-        dateFormatter.dateFormat = "yyyy-MM-dd"
+        dateFormatter.dateFormat = "yyyy-MM-dd HH:mm:ss"
         date <- (map["date"], DateFormatterTransform(dateFormatter: dateFormatter))
     }
 }

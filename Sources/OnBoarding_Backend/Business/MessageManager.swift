@@ -75,6 +75,7 @@ class MessageManager {
                     messages.append(Message(row: row))
                 }
             }
+
             guard let json = messages.toJSONString(prettyPrint: true) else {
                 completion(nil, HTTPStatusCode.badRequest)
                 return
