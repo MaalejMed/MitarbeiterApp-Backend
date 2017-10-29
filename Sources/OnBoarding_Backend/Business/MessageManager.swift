@@ -87,7 +87,7 @@ class MessageManager {
         self.connection.connect() {[unowned self] error in
             var messages : [SubMessage] = []
             let subMessageT = SubMessageT()
-            let query = Select(from: subMessageT).where(subMessageT.messageID == messageID).order(by: .DESC(subMessageT.date))
+            let query = Select(from: subMessageT).where(subMessageT.messageID == messageID).order(by: .ASC(subMessageT.date))
             self.connection.execute(query: query) {queryResult in
                 guard let resultSet = queryResult.asResultSet else {
                     completion(nil, HTTPStatusCode.serviceUnavailable)
