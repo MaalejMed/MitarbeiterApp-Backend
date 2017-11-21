@@ -43,7 +43,6 @@ class TimeManager {
     
     //MARK:- Select last submission
     func selectLastSubmittedDay(associateID: String , completion: @escaping ((String?, HTTPStatusCode?)->())) {
-        var lastSubmittedDay: String?
         self.connection.connect() {[unowned self] error in
             let time = TimeT()
             let query = Select(time.day, from: time).where(time.associateID == associateID).order(by: .DESC(time.day))
@@ -52,13 +51,12 @@ class TimeManager {
                     completion(nil, HTTPStatusCode.serviceUnavailable)
                     return
                 }
-                for row in resultSet.rows {
-                    lastSubmittedDay = row[0] as? String ?? ""
-                    break
+                guard let element = resultSet.rows.first(where: { $0 != nil }), let date = element[0] as? String else {
+                    completion(nil, HTTPStatusCode.notFound)
+                    return
                 }
+                completion(date, nil)
             }
         }
-        
-        let _ = (lastSubmittedDay != nil) ? completion(lastSubmittedDay, nil) : completion(nil, HTTPStatusCode.notFound)
     }
 }

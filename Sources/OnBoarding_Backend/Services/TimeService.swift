@@ -46,16 +46,14 @@ class TimeService {
         router.get("/LastSubmittedDay") { [unowned self] request, response, next in
             let associateID = request.queryParameters["associateID"] ?? ""
             let timeManager = TimeManager(router: self.router, connection: self.connection)
-            timeManager.selectLastSubmittedDay(associateID: associateID, completion: { day, failure in
+            timeManager.selectLastSubmittedDay(associateID: "645438", completion: { day, failure in
                 lastSubmittedDay = day
                 responseStatus = failure
             })
             
             let _ = (lastSubmittedDay != nil && responseStatus == nil) ? try response.send(lastSubmittedDay!).end() : try response.send("\(responseStatus!.rawValue)").end()
             next()
+          
         }
-        responseStatus = HTTPStatusCode.unknown
-        lastSubmittedDay = nil
-
     }
 }
