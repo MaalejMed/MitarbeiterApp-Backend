@@ -46,7 +46,7 @@ class TimeManager {
         var date: Any?
         self.connection.connect() {[unowned self] error in
             let timeT = TimeT()
-            let query = Select(timeT.day, from: timeT).where(timeT.associateID == associateID).order(by: .DESC(timeT.day)).limit(to: 1)
+            let query = Select(timeT.day, from: timeT).where(timeT.associateID == associateID).order(by: .DESC(timeT.day))
             self.connection.execute(query: query) {queryResult in
                 guard let resultSet = queryResult.asResultSet else {
                     completion(nil, HTTPStatusCode.serviceUnavailable)
@@ -54,8 +54,6 @@ class TimeManager {
                 }
                 for row in resultSet.rows {
                     date = row[0]
-
-                    
                 }
                 guard let dateString = date as? String else {
                     completion(nil, HTTPStatusCode.notFound)
