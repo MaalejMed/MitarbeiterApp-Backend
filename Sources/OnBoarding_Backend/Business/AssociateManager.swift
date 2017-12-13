@@ -20,31 +20,30 @@ class AssociateManager {
     }
     
     //MARK:-
-    func selectAssociate(username: String, password: String, completion: @escaping (String?, HTTPStatusCode?)->()) {
-        var associate: Associate?
+    func fetchProfileData(associateID: String, completion: @escaping (String?, HTTPStatusCode?)->()) {
         self.connection.connect() {[unowned self] error in
             let associateTable = AssociateT()
-            let query = Select(from: associateTable).where(associateTable.identifier == username && associateTable.password == password)
+            let query = Select(from: associateTable).where(associateTable.identifier == associateID)
             self.connection.execute(query: query) {queryResult in
                 guard let resultSet = queryResult.asResultSet else {
                     completion(nil, HTTPStatusCode.serviceUnavailable)
                     return
                 }
+                
                 for row in resultSet.rows {
-                    associate = Associate(row: row)
+                    guard let associate = Associate(row: row) else {
+                        completion(nil, HTTPStatusCode.unauthorized)
+                        return
+                    }
+                    guard let jsonPayload = Mapper().toJSONString(associate, prettyPrint: true) else {
+                        completion(nil, HTTPStatusCode.badRequest)
+                        return
+                    }
+                    completion(jsonPayload, nil)
                 }
             }
         }
-        guard let theAssociate = associate else {
-            completion(nil, HTTPStatusCode.unauthorized)
-            return
-        }
-        
-        guard let jsonPayload = Mapper().toJSONString(theAssociate, prettyPrint: true) else {
-            completion(nil, HTTPStatusCode.badRequest)
-            return
-        }
-        completion(jsonPayload, nil)
+
     }
     
     // MARK:-

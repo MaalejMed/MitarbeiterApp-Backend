@@ -5,7 +5,10 @@ import SwiftKuery
 //MARK:- Create a new router
 let router = Router()
 
-
+//MARK:- Authentication services
+let authConnection = MySQLConnection(host: "localhost", user: "root", password: "mysql", database: "cognizant",
+                                     port: 3306, characterSet: nil)
+let authenticationService = AuthenticationService(router: router, connection: authConnection)
 
 //MARK:- Associate services
 let asConnection = MySQLConnection(host: "localhost", user: "root", password: "mysql", database: "cognizant",

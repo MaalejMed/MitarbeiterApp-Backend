@@ -15,22 +15,21 @@ class AssociateService {
         self.router = router
         self.connection = connection
         router.all(middleware: BodyParser())
-        login()
+        fetchProfileData()
         changeProfilePhoto()
     }
     
     //MARK:- GET: Login
-    func login() {
-        router.get("/Login") { [unowned self] request, response, next in
-            let username = request.queryParameters["username"] ?? ""
-            let password = request.queryParameters["password"] ?? ""
+    func fetchProfileData() {
+        router.get("/profile") { [unowned self] request, response, next in
+            let associateID = request.queryParameters["associateID"] ?? ""
             let associateManager = AssociateManager(router: self.router, connection: self.connection)
-            associateManager.selectAssociate(username: username, password: password, completion: { associate, failure in
-                guard let exsitingAssociate = associate,  failure == nil else {
+            associateManager.fetchProfileData(associateID: associateID, completion: { associate, failure in
+                guard associate != nil,  failure == nil else {
                     response.send("\(failure!.rawValue)")
                     return
                 }
-                response.send(exsitingAssociate)
+                response.send(associate!)
                 next()
             })
         }

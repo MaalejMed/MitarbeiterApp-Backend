@@ -10,13 +10,15 @@ struct Associate: Mappable {
     var imageURL: String?
     var imageString: String?
     
-    init(row: [Any?]) {
-        name = row[0] as? String ?? ""
-        email = row[1] as? String ?? ""
-        identifier = row[2] as? String ?? ""
-        password = row[3] as? String ?? ""
-        imageURL = row[4] as? String ?? ""
-        imageString = PhotoManager.readImage(associateID: identifier!)
+    init?(row: [Any?]) {
+        guard let name = row[0] as? String, let email = row[1] as? String, let identifier = row[2] as? String, let password = row[3] as? String else {
+            return
+        }
+        self.name = name
+        self.email = email
+        self.identifier = identifier
+        self.password = password
+        imageString = PhotoManager.readImage(associateID: identifier)
     }
     
     // Mappable
@@ -26,9 +28,9 @@ struct Associate: Mappable {
     
     mutating func mapping(map: Map) {
         identifier <- map["identifier"]
+        password <- map["password"]
         email <- map["email"]
         name <- map["name"]
-        password <- map["password"]
         imageString <- map["photo"]
     }
 }
