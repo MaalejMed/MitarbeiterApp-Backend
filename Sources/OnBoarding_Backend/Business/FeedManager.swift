@@ -17,8 +17,8 @@ class FeedManager {
         self.connection = connection
     }
     
-    func selectFeeds(completion: @escaping (String?, HTTPStatusCode?)->()) {
-        self.connection.connect() {[unowned self] error in
+    func fetch(completion: @escaping (String?, HTTPStatusCode?)->()) {
+        self.connection.connect() { error in
             var feeds : [Feed] = []
             let feed = FeedT()
             let query = Select(from: feed).order(by: .DESC(feed.date))

@@ -15,14 +15,14 @@ class TimeService {
         self.router = router
         self.connection = connection
         router.all(middleware: BodyParser())
-        submitTimesheet()
-        lastSubmittedDay()
+        submit()
+        fetchLastDay()
     }
     
     //MARK:-
-    func submitTimesheet() {
-        var responseStatus: HTTPStatusCode?
-        router.post("/SubmitTimesheet") {request, response, next in
+    func submit() {
+        var responseStatus: HTTPStatusCode = HTTPStatusCode.unknown
+        router.post("/submit") {request, response, next in
             guard let jsonPayload = Formatter.jsonPayload(request: request) else {
                 try response.send("\(HTTPStatusCode.badRequest.rawValue)").end()
                 next()
@@ -30,30 +30,29 @@ class TimeService {
             }
             
             let timeManager = TimeManager(router: self.router, connection: self.connection)
-            timeManager.insertTimesheet(json: jsonPayload, completion: { response in
+            timeManager.submit(json: jsonPayload, completion: { response in
                 responseStatus = response
             })
             
-            try response.send("\(responseStatus!.rawValue)").end()
+            try response.send("\(responseStatus.rawValue)").end()
             next()
         }
-        responseStatus = HTTPStatusCode.unknown
     }
     
-    func lastSubmittedDay() {
+    func fetchLastDay() {
         var responseStatus: HTTPStatusCode?
         var lastSubmittedDay: String?
-        router.get("/LastSubmittedDay") { [unowned self] request, response, next in
+        router.get("/lastDay") { request, response, next in
             let associateID = request.queryParameters["associateID"] ?? ""
             let timeManager = TimeManager(router: self.router, connection: self.connection)
-            timeManager.selectLastSubmittedDay(associateID: associateID, completion: { day, failure in
+            timeManager.fetchLastDay(associateID: associateID, completion: { day, failure in
                 lastSubmittedDay = day
                 responseStatus = failure
             })
             
             let _ = (lastSubmittedDay != nil && responseStatus == nil) ? try response.send(lastSubmittedDay!).end() : try response.send("\(responseStatus!.rawValue)").end()
             next()
-          
+
         }
     }
 }

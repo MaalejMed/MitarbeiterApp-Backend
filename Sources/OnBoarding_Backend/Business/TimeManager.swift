@@ -19,19 +19,19 @@ class TimeManager {
     }
     
     //MARK:-
-    func insertTimesheet(json: JSON, completion: @escaping (HTTPStatusCode)->()) {
+    func submit(json: JSON, completion: @escaping (HTTPStatusCode)->()) {
         guard let timesheet = Timesheet(row: json) else {
             completion(HTTPStatusCode.badRequest)
             return
         }
 
-        self.connection.connect() { [weak self] error in
+        self.connection.connect() { error in
             let tsTable = TimeT()
             let query = Insert(into: tsTable,
                                columns:[tsTable.associateID, tsTable.day, tsTable.projectID, tsTable.activity, tsTable.billable, tsTable.workFrom, tsTable.workUntil, tsTable.workedHours, tsTable.lunchBreak],
                                values: [timesheet.associateID!, timesheet.day!, timesheet.projectID!, timesheet.activity!, timesheet.billable!, timesheet.workFrom!, timesheet.workUntil!, timesheet.workedHours!, timesheet.lunchBreak!])
             
-            self?.connection.execute(query: query) { queryResult in
+            self.connection.execute(query: query) { queryResult in
                 guard queryResult.asError == nil else {
                     completion(HTTPStatusCode.serviceUnavailable)
                     return
@@ -42,7 +42,7 @@ class TimeManager {
     }
     
     //MARK:- Select last submission
-    func selectLastSubmittedDay(associateID: String , completion: @escaping ((String?, HTTPStatusCode?)->())) {
+    func fetchLastDay(associateID: String , completion: @escaping ((String?, HTTPStatusCode?)->())) {
         var date: Any?
         self.connection.connect() {[unowned self] error in
             let timeT = TimeT()

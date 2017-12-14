@@ -21,7 +21,7 @@ class AuthenticationManager {
     
     //MARK:- Login
     func login(associateID: String, password: String, completion: @escaping (HTTPStatusCode)->()) {
-        self.connection.connect() {[unowned self] error in
+        self.connection.connect() { error in
             let associateTable = AssociateT()
             let query = Select(from: associateTable).where(associateTable.identifier == associateID && associateTable.password == password)
             self.connection.execute(query: query) {queryResult in

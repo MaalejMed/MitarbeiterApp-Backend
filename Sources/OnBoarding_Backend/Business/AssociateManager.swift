@@ -20,7 +20,7 @@ class AssociateManager {
     }
     
     //MARK:-
-    func fetchProfileData(associateID: String, completion: @escaping (String?, HTTPStatusCode?)->()) {
+    func fetchData(associateID: String, completion: @escaping (String?, HTTPStatusCode?)->()) {
         self.connection.connect() {[unowned self] error in
             let associateTable = AssociateT()
             let query = Select(from: associateTable).where(associateTable.identifier == associateID)
@@ -30,24 +30,29 @@ class AssociateManager {
                     return
                 }
                 
+                var assRow: [Any?] = []
+                
                 for row in resultSet.rows {
-                    guard let associate = Associate(row: row) else {
-                        completion(nil, HTTPStatusCode.unauthorized)
-                        return
-                    }
-                    guard let jsonPayload = Mapper().toJSONString(associate, prettyPrint: true) else {
-                        completion(nil, HTTPStatusCode.badRequest)
-                        return
-                    }
-                    completion(jsonPayload, nil)
+                    assRow = row
                 }
+                
+                guard let associate = Associate(row: assRow) else {
+                    completion(nil, HTTPStatusCode.unauthorized)
+                    return
+                }
+                
+                guard let jsonPayload = Mapper().toJSONString(associate, prettyPrint: true) else {
+                    completion(nil, HTTPStatusCode.badRequest)
+                    return
+                }
+                completion(jsonPayload, nil)
             }
         }
 
     }
     
     // MARK:-
-    func updateAssociatePhoto(json: JSON, completion: @escaping (HTTPStatusCode)->()) {
+    func updatePhoto(json: JSON, completion: @escaping (HTTPStatusCode)->()) {
         guard let imageString = json["photo"].string, let associateID = json["associateID"].string else {
             completion(HTTPStatusCode.badRequest)
             return
@@ -67,7 +72,6 @@ class AssociateManager {
                     return
                 }
                 let _ =  queryResult.success == true ?  completion(HTTPStatusCode.OK): completion(HTTPStatusCode.badRequest)
-                
             }
         }
     }

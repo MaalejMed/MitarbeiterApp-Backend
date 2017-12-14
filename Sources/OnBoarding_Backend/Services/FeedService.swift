@@ -19,9 +19,9 @@ class FeedService {
     
     //MARK:- Fetch
     func fetch() {
-        router.get("/Feed") { [unowned self] request, response, next in
+        router.get("/feed") { [unowned self] request, response, next in
             let feedManager = FeedManager(router: self.router, connection: self.connection)
-            feedManager.selectFeeds(completion: { feedJson, failure in
+            feedManager.fetch(completion: { feedJson, failure in
                 guard let feeds = feedJson else {
                     response.send("\(failure!.rawValue)")
                     return
