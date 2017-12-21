@@ -19,8 +19,10 @@ class MessageService {
         submitSubMessage()
         fetch()
         fetchSubMessages()
+        fetchAll()
     }
     
+    //MARK:- Associate related webservices
     func submitMessage() {
         var responseStatus: HTTPStatusCode?
         router.post("/SubmitMessage") {request, response, next in
@@ -30,7 +32,7 @@ class MessageService {
                 return
             }
             let messageManager = MessageManager(router: self.router, connection:self.connection)
-            messageManager.insertMessage(json: jsonPayload, completion: { response in
+            messageManager.submitMessage(json: jsonPayload, completion: { response in
                 responseStatus = response
             })
             try response.send("\(responseStatus!.rawValue)").end()
@@ -47,7 +49,7 @@ class MessageService {
                 return
             }
             let messageManager = MessageManager(router: self.router, connection:self.connection)
-            messageManager.insertSubMessage(json: jsonPayload, completion: { response in
+            messageManager.submitSubMessage(json: jsonPayload, completion: { response in
                 responseStatus = response
             })
             try response.send("\(responseStatus!.rawValue)").end()
@@ -59,11 +61,14 @@ class MessageService {
         router.get("/Message") { [unowned self] request, response, next in
             let associateID = request.queryParameters["associateID"] ?? ""
             let messageManager = MessageManager(router: self.router, connection: self.connection)
-            messageManager.selectMessages(associateID: associateID , completion: { messageJson, failure in
+            messageManager.fetchMessages(associateID: associateID , completion: { messageJson, failure in
                 guard let messages = messageJson else {
                     response.send("\(failure!.rawValue)")
                     return
                 }
+                response.headers["Access-Control-Allow-Headers"] = "X-Requested-With, Content-Type, X-Codingpedia, Authorization"
+                response.headers["Access-Control-Allow-Origin"] = "*"
+                response.headers["Access-Control-Allow-Methods"] = "GET, POST, DELETE, PUT, OPTIONS"
                 response.send(messages)
                 next()
             })
@@ -74,11 +79,32 @@ class MessageService {
         router.get("/SubMessage") { [unowned self] request, response, next in
             let messageID = request.queryParameters["messageID"] ?? ""
             let messageManager = MessageManager(router: self.router, connection: self.connection)
-            messageManager.selectSubMessages(messageID: messageID , completion: { messageJson, failure in
+            messageManager.fetchSubMessages(messageID: messageID , completion: { messageJson, failure in
                 guard let messages = messageJson else {
                     response.send("\(failure!.rawValue)")
                     return
                 }
+                response.headers["Access-Control-Allow-Headers"] = "X-Requested-With, Content-Type, X-Codingpedia, Authorization"
+                response.headers["Access-Control-Allow-Origin"] = "*"
+                response.headers["Access-Control-Allow-Methods"] = "GET, POST, DELETE, PUT, OPTIONS"
+                response.send(messages)
+                next()
+            })
+        }
+    }
+    
+    //MARK:- others
+    func fetchAll() {
+        router.get("/MessageGSD") { [unowned self] request, response, next in
+            let messageManager = MessageManager(router: self.router, connection: self.connection)
+            messageManager.fetchAllMessages(completion: { messageJson, failure in
+                guard let messages = messageJson else {
+                    response.send("\(failure!.rawValue)")
+                    return
+                }
+                response.headers["Access-Control-Allow-Headers"] = "X-Requested-With, Content-Type, X-Codingpedia, Authorization"
+                response.headers["Access-Control-Allow-Origin"] = "*"
+                response.headers["Access-Control-Allow-Methods"] = "GET, POST, DELETE, PUT, OPTIONS"
                 response.send(messages)
                 next()
             })

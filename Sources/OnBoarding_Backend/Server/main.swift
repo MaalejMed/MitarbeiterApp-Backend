@@ -31,6 +31,6 @@ let msConnection = MySQLConnection(host: "localhost", user: "root", password: "m
 let messageService = MessageService(router: router, connection: msConnection)
 
 //MARK:-Start Service
-Kitura.addHTTPServer(onPort: 8080, with: router)
+Kitura.addHTTPServer(onPort: 7111, with: router)
 Kitura.run()
     

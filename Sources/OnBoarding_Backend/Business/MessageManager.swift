@@ -19,8 +19,8 @@ class MessageManager {
         router.all(middleware: BodyParser())
     }
     
-    //MARK:-
-    func insertMessage(json: JSON, completion: @escaping (HTTPStatusCode)->()) {
+    //MARK:- Associate related webservices
+    func submitMessage(json: JSON, completion: @escaping (HTTPStatusCode)->()) {
         guard let message = Message(row: json) else {
             completion(HTTPStatusCode.badRequest)
             return
@@ -40,7 +40,7 @@ class MessageManager {
         }
     }
     
-    func insertSubMessage(json: JSON, completion: @escaping (HTTPStatusCode)->()) {
+    func submitSubMessage(json: JSON, completion: @escaping (HTTPStatusCode)->()) {
         guard let subMessage = SubMessage(row: json) else {
             completion(HTTPStatusCode.badRequest)
             return
@@ -60,8 +60,7 @@ class MessageManager {
         }
     }
     
-    //MARK:-
-    func selectMessages(associateID: String , completion: @escaping ((String?, HTTPStatusCode?)->())) {
+    func fetchMessages(associateID: String , completion: @escaping ((String?, HTTPStatusCode?)->())) {
         self.connection.connect() {[unowned self] error in
             var messages : [Message] = []
             let messagesT = MessageT()
@@ -84,7 +83,7 @@ class MessageManager {
         }
     }
     
-    func selectSubMessages(messageID: String , completion: @escaping ((String?, HTTPStatusCode?)->())) {
+    func fetchSubMessages(messageID: String , completion: @escaping ((String?, HTTPStatusCode?)->())) {
         self.connection.connect() {[unowned self] error in
             var messages : [SubMessage] = []
             let subMessageT = SubMessageT()
@@ -105,4 +104,29 @@ class MessageManager {
             completion(json, nil)
         }
     }
+    
+    //MARK:- Others
+    func fetchAllMessages(completion: @escaping ((String?, HTTPStatusCode?)->())) {
+        self.connection.connect() {[unowned self] error in
+            var messages : [Message] = []
+            let messagesT = MessageT()
+            let query = Select(from: messagesT).order(by: .DESC(messagesT.date))
+            self.connection.execute(query: query) {queryResult in
+                guard let resultSet = queryResult.asResultSet else {
+                    completion(nil, HTTPStatusCode.serviceUnavailable)
+                    return
+                }
+                for row in resultSet.rows {
+                    messages.append(Message(row: row))
+                }
+            }
+            
+            guard let json = messages.toJSONString(prettyPrint: true) else {
+                completion(nil, HTTPStatusCode.badRequest)
+                return
+            }
+            completion(json, nil)
+        }
+    }
+
 }
